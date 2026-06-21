@@ -22,13 +22,23 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     payload = auth.decode_access_token(token)
     if not payload or "sub" not in payload:
         logger.warning("Invalid token received")
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
     email = payload.get("sub")
     user = crud.get_user_by_email(db, email=email)
     if not user:
         logger.warning(f"User not found for email: {email}")
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
     return user
+
+
+def get_current_active_user(current_user: models.User = Depends(get_current_user)):
+    if not current_user.is_active:
+        raise HTTPException(status_code=400, detail="Inactive user")
+    return current_user
 
 
 
@@ -56,7 +66,7 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 
 
 @app.get("/users/me", response_model=schemas.User)
-def read_users_me(current_user: models.User = Depends(get_current_user)):
+def read_users_me(current_user: models.User = Depends(get_current_active_user)):
     return current_user
 
 
@@ -66,7 +76,7 @@ def read_users_me(current_user: models.User = Depends(get_current_user)):
 def create_task(
         item: schemas.TaskCreate,
         db: Session = Depends(get_db),
-        current_user: models.User = Depends(get_current_user)  # Secured!
+        current_user: models.User = Depends(get_current_active_user)  # Secured!
 ):
     """Create a task for the currently authenticated user."""
     return crud.create_user_task(db=db, item=item, user_id=current_user.id)
@@ -77,7 +87,7 @@ def read_my_tasks(
         skip: int = 0,
         limit: int = 50,
         db: Session = Depends(get_db),
-        current_user: models.User = Depends(get_current_user)  # Secured
+        current_user: models.User = Depends(get_current_active_user)  # Secured
 ):
     """Fetch only the logged-in user's tasks."""
     return crud.get_user_tasks(db, user_id=current_user.id, skip=skip, limit=limit)
@@ -89,7 +99,7 @@ def read_tasks_by_status(
         skip: int = 0,
         limit: int = 50,
         db: Session = Depends(get_db),
-        current_user: models.User = Depends(get_current_user)
+        current_user: models.User = Depends(get_current_active_user)
 ):
     """Filter the logged-in user's tasks by progress (pending, active, completed)."""
     return crud.get_user_tasks_by_progress(
@@ -102,7 +112,7 @@ def update_task_status(
         task_id: int,
         new_status: schemas.PROGRESS,
         db: Session = Depends(get_db),
-        current_user: models.User = Depends(get_current_user)
+        current_user: models.User = Depends(get_current_active_user)
 ):
     """Update a task's status if it belongs to the current user."""
     db_task = crud.get_task_by_id(db, task_id=task_id)
@@ -116,7 +126,7 @@ def update_task_status(
 def delete_user_task(
         task_id: int,
         db: Session = Depends(get_db),
-        current_user: models.User = Depends(get_current_user)
+        current_user: models.User = Depends(get_current_active_user)
 ):
     """Delete a task if it belongs to the current user."""
     db_task = crud.get_task_by_id(db, task_id=task_id)
