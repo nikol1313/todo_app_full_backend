@@ -1,11 +1,5 @@
 from sqlalchemy.orm import Session
-from auth import get_password_hash
-import models
-import schemas
-
-
-from sqlalchemy.orm import Session
-from auth import get_password_hash
+from app.auth import get_password_hash
 import models
 import schemas
 from logging_config import get_logger
