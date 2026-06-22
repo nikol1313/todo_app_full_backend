@@ -1,8 +1,10 @@
+from datetime import datetime
+
 from sqlalchemy.orm import Session
 from app.auth import get_password_hash
-import models
-import schemas
-from logging_config import get_logger
+from app import models
+from app import schemas
+from app.logging_config import get_logger
 
 logger = get_logger(__name__)
 
@@ -47,8 +49,8 @@ def get_task_by_id(db: Session, task_id: int):
 
 
 def get_user_tasks(db: Session, user_id: int, skip: int = 0, limit: int = 50):
-    """fetch task by user id"""
-    return db.query(models.Tasks).filter(models.Tasks.owner_id == user_id).offset(skip).limit(limit).all()
+    """fetch task by user id (excluding deleted)"""
+    return db.query(models.Tasks).filter(models.Tasks.owner_id == user_id, models.Tasks.deleted_at == None).offset(skip).limit(limit).all()
 
 
 def create_user_task(db: Session, item: schemas.TaskCreate, user_id: int):
@@ -69,17 +71,29 @@ def update_task_progress(db: Session, task_id: int, new_progress: schemas.PROGRE
     return db_task
 
 def delete_task(db: Session, task_id: int):
-    """delete task by id"""
+    """delete task by id (soft delete)"""
     db_task = db.query(models.Tasks).filter(models.Tasks.id == task_id).first()
     if db_task:
-        db.delete(db_task)
+        db_task.deleted_at = datetime.utcnow()
         db.commit()
+        db.refresh(db_task)
         return True
     return False
 
 def get_user_tasks_by_progress(db: Session, user_id: int, progress: schemas.PROGRESS, skip: int = 0, limit: int = 50):
-    """Fetch user's tasks that match a specific status"""
+    """Fetch user's tasks that match a specific status (excluding deleted)"""
     return db.query(models.Tasks).filter(
         models.Tasks.owner_id == user_id,
-        models.Tasks.progress == progress
+        models.Tasks.progress == progress,
+        models.Tasks.deleted_at == None
     ).offset(skip).limit(limit).all()
+
+def restore_task(db: Session , task_id: int):
+    """restore task by id"""
+    db_task = db.query(models.Tasks).filter(models.Tasks.id == task_id).first()
+    if db_task and db_task.deleted_at is not None:
+        db_task.deleted_at = None
+        db.commit()
+        db.refresh(db_task)
+        return db_task
+    return None

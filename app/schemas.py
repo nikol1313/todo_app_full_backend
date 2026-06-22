@@ -1,5 +1,7 @@
 from datetime import datetime
 from enum import Enum
+from typing import Optional
+
 from pydantic import BaseModel, ConfigDict, Field, EmailStr
 
 class PROGRESS(str, Enum):
@@ -23,7 +25,7 @@ class Tasks(BaseModel):
 
     due_date: datetime | None = None
     created_at: datetime = Field(default_factory=datetime.utcnow)
-
+    deleted_at: Optional[datetime] = None
 class TaskCreate(Tasks):
     pass
 

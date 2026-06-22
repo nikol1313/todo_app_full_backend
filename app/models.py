@@ -1,8 +1,8 @@
 #1. imports
 from sqlalchemy import ForeignKey, String, DateTime, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from database import Base
-from schemas import PROGRESS, PRIORITY
+from app.database import Base
+from app.schemas import PROGRESS, PRIORITY
 from datetime import datetime
 
 
@@ -29,7 +29,10 @@ class Tasks(Base):
     progress: Mapped[PROGRESS] = mapped_column(Enum(PROGRESS), default=PROGRESS.PENDING)
 
     due_date: Mapped[datetime | None] = mapped_column(DateTime, default=None)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, default=None)
+
     description: Mapped[str | None] = mapped_column(String, index=True, default=None)
 
     owner_id: Mapped[int] = mapped_column(ForeignKey("users.id"))

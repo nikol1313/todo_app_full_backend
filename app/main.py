@@ -3,11 +3,11 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from app import auth
-import crud
-import models
-import schemas
-from database import engine, get_db
-from logging_config import get_logger
+from app import crud
+from app import models
+from app import schemas
+from app.database import engine, get_db
+from app.logging_config import get_logger
 
 logger = get_logger(__name__)
 
@@ -135,3 +135,15 @@ def delete_user_task(
 
     crud.delete_task(db, task_id=task_id)
     return {"detail": "Task deleted successfully"}
+
+@app.post("/tasks/{task_id}/restore", response_model=schemas.Task)
+def restore_user_task(
+    task_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_active_user)
+):
+    """Restore soft-deleted task."""
+    restored_task = crud.restore_task(db, task_id=task_id)
+    if not restored_task or restored_task.owner_id != current_user.id:
+        raise HTTPException(status_code=404, detail="Task not found or unauthorized")
+    return restored_task

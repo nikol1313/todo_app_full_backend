@@ -2,8 +2,8 @@ from datetime import datetime, timedelta
 from typing import Optional
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from setting import settings
-from logging_config import get_logger
+from app.setting import settings
+from app.logging_config import get_logger
 
 logger = get_logger(__name__)
 
