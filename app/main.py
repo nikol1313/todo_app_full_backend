@@ -43,6 +43,11 @@ def get_current_active_user(current_user: models.User = Depends(get_current_user
 
 
 # AUTH & USER ROUTES
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
+
+
 @app.post("/token")
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = crud.get_user_by_email(db, email=form_data.username)
