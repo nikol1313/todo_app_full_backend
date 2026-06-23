@@ -1,6 +1,6 @@
 from datetime import datetime
 from enum import Enum
-from typing import Optional
+from typing import Optional, List
 
 from pydantic import BaseModel, ConfigDict, Field, EmailStr
 
@@ -49,6 +49,6 @@ class UserCreate(UserBase):
 class User(UserBase):
     id: int
     is_active: bool
-    tasks: list[Task] = []
+    tasks: Optional[List[Task]] = []
 
     model_config = ConfigDict(from_attributes=True)
