@@ -1,6 +1,6 @@
 # Backend App
 
-Simple FastAPI backend. Auth + Task management.
+Simple FastAPI backend. Auth + Notes + Task management.
 
 ## Setup
 1. Create `.env`:
