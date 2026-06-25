@@ -1,5 +1,5 @@
 #1. imports
-from sqlalchemy import ForeignKey, String, DateTime, Enum
+from sqlalchemy import ForeignKey, String, DateTime, Enum, Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database import Base
 from app.schemas import PROGRESS, PRIORITY
@@ -16,7 +16,7 @@ class User(Base):
     is_active: Mapped[bool] = mapped_column(default=True)
 
     tasks: Mapped[list["Tasks"]] = relationship(back_populates="owner")
-
+    notes: Mapped[list["Notes"]] = relationship(back_populates="owner")
 
 
 class Tasks(Base):
@@ -38,6 +38,13 @@ class Tasks(Base):
     owner_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     owner: Mapped["User"] = relationship(back_populates="tasks")
 
+class Notes(Base):
+    __tablename__ = "notes"
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    title: Mapped[str] = mapped_column(String, default=None)
+    content: Mapped[str] = mapped_column(String, default=None)
+    owner_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    owner: Mapped["User"] = relationship(back_populates="notes")
 
 
 

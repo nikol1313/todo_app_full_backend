@@ -152,3 +152,20 @@ def restore_user_task(
     if not restored_task or restored_task.owner_id != current_user.id:
         raise HTTPException(status_code=404, detail="Task not found or unauthorized")
     return restored_task
+
+@app.post("/notes/",response_model=schemas.Note)
+def note_create(note: schemas.NoteCreate,
+                current_user: models.User = Depends(get_current_active_user),
+                db: Session = Depends(get_db),
+                ):
+    """Create note"""
+    return crud.create_note(db=db, note=note, user_id=current_user.id)
+
+@app.get("/notes/", response_model=list[schemas.Note])
+def read_my_notes(skip: int = 0,
+                  limit: int = 50,
+                  db: Session = Depends(get_db),
+                  current_user: models.User = Depends(get_current_active_user)
+                 ):
+    """fetch notes of users who are logged in"""
+    return crud.get_notes(db=db, user_id=current_user.id, skip=skip, limit=limit)

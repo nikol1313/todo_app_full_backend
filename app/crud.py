@@ -97,3 +97,16 @@ def restore_task(db: Session , task_id: int):
         db.refresh(db_task)
         return db_task
     return None
+
+def create_note(db: Session, user_id: int, note: schemas.NoteCreate):
+    db_note = models.Notes(**note.model_dump() ,owner_id=user_id)
+    db.add(db_note)
+    db.commit()
+    db.refresh(db_note)
+    return db_note
+
+
+def get_notes(db: Session, user_id: int, skip: int=0 , limit: int=50):
+    return db.query(models.Notes).filter(models.Notes.owner_id == user_id).offset(skip).limit(limit).all()
+    
+

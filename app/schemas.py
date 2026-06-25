@@ -36,6 +36,17 @@ class Task(Tasks):
 
     model_config = ConfigDict(from_attributes=True)
 
+class NoteBase(BaseModel):
+    title: str
+    content: str
+
+class NoteCreate(NoteBase):
+    pass
+
+class Note(NoteBase):
+    id: int
+    owner_id: int
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UserBase(BaseModel):
@@ -50,5 +61,8 @@ class User(UserBase):
     id: int
     is_active: bool
     tasks: Optional[List[Task]] = []
+    notes: Optional[List[Note]] = []
 
     model_config = ConfigDict(from_attributes=True)
+
+
