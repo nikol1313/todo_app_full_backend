@@ -43,10 +43,18 @@ def get_current_active_user(current_user: models.User = Depends(get_current_user
 
 
 # AUTH & USER ROUTES
-@app.get("/health")
+@app.get("/health", tags=["Health"])
 def health_check():
-    return {"status": "ok"}
+    return {
+        "status": "ok"
+    }
 
+@app.get("/", tags=["Root"])
+def root():
+    return {
+        "massage": "Welcome to my app",
+        "documentation": "/docs"
+    }
 
 @app.post("/token")
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):

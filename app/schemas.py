@@ -34,11 +34,12 @@ class Task(Tasks):
     id: int
     owner_id: int
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, str_strip_whitespace=True, extra='forbid', validate_assignment=True)
+
 
 class NoteBase(BaseModel):
     title: str
-    content: str
+    content: str = Field(min_length=1,max_digits=100)
 
 class NoteCreate(NoteBase):
     pass
@@ -46,7 +47,8 @@ class NoteCreate(NoteBase):
 class Note(NoteBase):
     id: int
     owner_id: int
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, str_strip_whitespace=True, extra='forbid', validate_assignment=True)
+
 
 
 class UserBase(BaseModel):
@@ -63,6 +65,6 @@ class User(UserBase):
     tasks: Optional[List[Task]] = []
     notes: Optional[List[Note]] = []
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, str_strip_whitespace=True, extra='forbid', validate_assignment=True)
 
 
