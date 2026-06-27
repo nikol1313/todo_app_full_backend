@@ -2,17 +2,22 @@
 
 Simple FastAPI backend. Auth + Task management.
 
-## Setup
-1. Create `.env`:
-   ```
-   DATABASE_URL=postgresql://user:pass@localhost:5432/db
-   PROJECT_NAME=backendapp
-   SECRET_KEY=yoursecret
-   ```
-2. Install dependencies + run:
+## Docker Setup
+
+### Prerequisites
+- Docker
+- Docker Compose
+
+### Running the App
+1. Create a `.env` file from the example:
    ```bash
-   uvicorn main:app --reload
+   cp .env.example .env
    ```
+2. Build and run the stack:
+   ```bash
+   docker compose up --build -d
+   ```
+3. The app is at `http://localhost:8080`.
 
 ## Features
 - JWT Auth

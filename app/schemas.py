@@ -39,7 +39,7 @@ class Task(Tasks):
 
 class NoteBase(BaseModel):
     title: str
-    content: str = Field(min_length=1,max_digits=100)
+    content: str = Field(min_length=1, max_length=1000)
 
 class NoteCreate(NoteBase):
     pass

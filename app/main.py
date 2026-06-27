@@ -177,3 +177,8 @@ def read_my_notes(skip: int = 0,
                  ):
     """fetch notes of users who are logged in"""
     return crud.get_notes(db=db, user_id=current_user.id, skip=skip, limit=limit)
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8080)
+
