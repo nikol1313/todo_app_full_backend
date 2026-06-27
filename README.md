@@ -17,7 +17,7 @@ Simple FastAPI backend. Auth + Notes + Task management.
    ```bash
    docker compose up --build -d
    ```
-3. The app is at `http://localhost:8080`.
+3. The app is available at `http://localhost:8080`.
 
 ## Features
 - JWT Auth
